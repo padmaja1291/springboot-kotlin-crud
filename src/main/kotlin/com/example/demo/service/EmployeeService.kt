@@ -5,15 +5,19 @@ import com.example.demo.model.CustomException
 import com.example.demo.model.Employee
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.server.ResponseStatusException
 
+/**
+ * This class handles all CRUD (create, Read, Update, Delete Operations) service
+ * @author Padmaja Krishna Kumar
+ * @version 1.0
+ * @since 03 Feb 2021
+ **/
 @Service
-class EmployeeService(@Autowired private val employeeDao : EmployeeDao) {
+class EmployeeService(@Autowired private val employeeDao : EmployeeDao,
+                      @Autowired private val validateEmailClient :ValidateEmailClient) {
 
     fun getAllEmployees(): List<Employee> =
             employeeDao.findAll()
@@ -24,13 +28,13 @@ class EmployeeService(@Autowired private val employeeDao : EmployeeDao) {
     fun hasMultipleLastname() : List<Employee> =
             employeeDao.hasMultipleLastName()
 
-
     fun saveEmployees(@RequestBody employee : Employee) :Employee  {
-        if(isLetters(employee.firstname) && isLetters(employee.lastname))
-            return employeeDao.save(employee)
+        if(isLetters(employee.firstname) && isLetters(employee.lastname)){
+            if(validateEmailClient.validateEmail(employee.email).format_valid)
+               return employeeDao.save(employee)
+            else throw CustomException("Email is not valid")
+        }
         else throw CustomException("Name cannot contains non alphabet characters")
-
-
     }
 
     fun updateEmployee(@PathVariable wwid : Long, @RequestBody employee : Employee): Employee {
@@ -40,7 +44,6 @@ class EmployeeService(@Autowired private val employeeDao : EmployeeDao) {
 
     }
 
-
     fun deleteEmployee(@PathVariable wwid : Long)  {
         try {
             employeeDao.deleteById(wwid)
@@ -49,11 +52,8 @@ class EmployeeService(@Autowired private val employeeDao : EmployeeDao) {
         }
     }
 
-
     fun isLetters(str: String): Boolean {
         return str.all { it.isLetter() }
     }
-
-
 
 }
