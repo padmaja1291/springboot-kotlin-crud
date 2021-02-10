@@ -16,7 +16,7 @@ This project consists of APIs to perform CRUD operations for a single Entity (Em
 * http://localhost:8080/crudwebservice/employees/{wwid} 
 
 **Delete	- DELETE**
-* http://localhost:8080/crudwebservice/employees/5 
+* http://localhost:8080/crudwebservice/employees/{wwid} 
 
 
 This project was created using [https://start.spring.io/](https://start.spring.io/) as a start with following options
