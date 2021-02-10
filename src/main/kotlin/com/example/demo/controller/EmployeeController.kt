@@ -65,8 +65,12 @@ class EmployeeController(@Autowired private val employeeService : EmployeeServic
                     .body(employeeService.updateEmployee(wwid,employee))
 
         }catch (e : CustomException){
-            throw ResponseStatusException(HttpStatus.NOT_FOUND,
+            if(e.message.equals("Employee does not exist"))
+                throw ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Employee Not Found")
+            else
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Input is not in valid format")
         }
 
     }

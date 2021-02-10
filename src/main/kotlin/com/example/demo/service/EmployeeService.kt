@@ -38,9 +38,13 @@ class EmployeeService(@Autowired private val employeeDao : EmployeeDao,
     }
 
     fun updateEmployee(@PathVariable wwid : Long, @RequestBody employee : Employee): Employee {
-        employeeDao.findOneByWwid(wwid).takeIf { e -> e != null }?.let {
-             return employeeDao.save(Employee(wwid, employee.email, employee.firstname, employee.lastname))
-        } ?: throw CustomException("Employee does not exist")
+        if(isLetters(employee.firstname) && isLetters(employee.lastname)) {
+            if(validateEmailClient.validateEmail(employee.email).format_valid)
+                employeeDao.findOneByWwid(wwid).takeIf { e -> e != null }?.let {
+                    return employeeDao.save(Employee(wwid, employee.email, employee.firstname, employee.lastname))
+                } ?: throw CustomException("Employee does not exist")
+            else throw CustomException("Email is not valid")
+        }else throw CustomException("Name cannot contains non alphabet characters")
 
     }
 
